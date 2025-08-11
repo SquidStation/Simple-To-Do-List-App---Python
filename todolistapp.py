@@ -24,7 +24,7 @@ def initializeApp():
     fetchTasks()
 
     #Display app guidelines
-    guides = (f"\nAdd New Task: Enter 1", "Add More Tasks: Enter 2","Delete a Task: Enter 3\n")
+    guides = (f"\nAdd New Task: Enter 1", "Add More Tasks: Enter 2","Delete a Task: Enter 3", "Update a Task: Enter 4\n")
     for guide in guides:
         print(guide)
     
@@ -37,6 +37,10 @@ def initializeApp():
         #get task id from user(remeber to validate data)
         taskId = int(input("Enter Task Number: "))
         deleteTasks(taskId)
+    elif choice == 4:
+        #get task id for task to edit
+        taskId = int(input("Enter Task Number: "))
+        editTasks(taskId)
     else:
         print(f"\nInvalid Input, Try again\n")
         
@@ -97,7 +101,35 @@ def deleteTasks(taskindex):
             writer.writerow({ "taskname": savedtask['taskname']})
 
 def editTasks(taskindex):
-    ...
+
+    savedTasks = []
+
+    #get stored data
+    with open("todolist.csv") as file:
+        tasks = csv.DictReader(file)
+        for row in tasks:
+            savedTasks.append(row) 
+
+    #Find item to edit
+    for index, savedTask in enumerate(savedTasks):
+        if index+1 == taskindex:
+            taskUpdate = input("Enter New Name: ")
+            updatedTask = {"taskname": taskUpdate}
+            savedTasks[index] = updatedTask
+            print(f"{savedTask['taskname']} Updated to {taskUpdate}!")
+
+    
+    #Before saving data make sure key header is written in csv file
+    with open("todolist.csv", 'w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=['taskname'])
+        writer.writeheader()
+
+    #Save updated data to memory
+    for savedTask in savedTasks:
+        with open("todolist.csv", 'a') as file:
+            writer = csv.DictWriter(file, fieldnames=["taskname"])
+            writer.writerow({"taskname": savedTask['taskname']})
+
 
 if __name__ == "__main__":
     main()
