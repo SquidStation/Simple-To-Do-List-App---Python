@@ -24,6 +24,7 @@ def initializeApp():
     fetchTasks()
 
     #Display app guidelines
+    print(f"\n***Select Option Below To Proceed***")
     guides = (f"\nAdd New Task: Enter 1", "Add More Tasks: Enter 2","Delete a Task: Enter 3", "Update a Task: Enter 4\n")
     for guide in guides:
         print(guide)
@@ -35,11 +36,11 @@ def initializeApp():
         writeTasks()
     elif choice == 3:
         #get task id from user(remeber to validate data)
-        taskId = int(input("Enter Task Number: "))
+        taskId = int(input("\nEnter Task ID/Number To Delete: "))
         deleteTasks(taskId)
     elif choice == 4:
         #get task id for task to edit
-        taskId = int(input("Enter Task Number: "))
+        taskId = int(input("\nEnter Task ID/Number To Edit: "))
         editTasks(taskId)
     else:
         print(f"\nInvalid Input, Try again\n")
@@ -48,7 +49,7 @@ def initializeApp():
 def writeTasks():
 
     #get task from the user
-    taskname = input("Enter name of task: ")
+    taskname = input(f"\nEnter name of task: ")
 
     #Write user input
     with open("todolist.csv", "a") as file:
@@ -58,7 +59,13 @@ def writeTasks():
             writer.writeheader() 
         else:
             writer.writerow({"taskname": taskname})
-        print("Task added!")
+        print(f"\n***{taskname} - Task added!***\n")
+
+    #Continue adding more tasks from user on demand.
+
+    print(f"\n*****To add more tasks enter 'Y or y' for Yes and 'N/n' for No*****\n")
+
+    moretasks = input("Add more tasks?")
 
 
 def fetchTasks():
@@ -71,7 +78,7 @@ def fetchTasks():
             savedtasks.append({"taskname": row['taskname']})
     
     for index, storedtask in enumerate(savedtasks):
-        print(f"{index+1}: {storedtask['taskname']}")
+        print(f"Id {index+1}: {storedtask['taskname']}")
 
 
 # function to delete tasks
@@ -89,7 +96,7 @@ def deleteTasks(taskindex):
     for index, savedtask in enumerate(savedtasks):
         if index+1 == taskindex:
             savedtasks.remove(savedtask)
-            print(f"({savedtask['taskname']}) Deleted!")
+            print(f"\n({savedtask['taskname']}) Deleted!\n")
 
     with open('todolist.csv', 'w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=["taskname"])
@@ -113,10 +120,10 @@ def editTasks(taskindex):
     #Find item to edit
     for index, savedTask in enumerate(savedTasks):
         if index+1 == taskindex:
-            taskUpdate = input("Enter New Name: ")
+            taskUpdate = input("\nEnter New Name: ")
             updatedTask = {"taskname": taskUpdate}
             savedTasks[index] = updatedTask
-            print(f"{savedTask['taskname']} Updated to {taskUpdate}!")
+            print(f"\n{savedTask['taskname']} Updated to {taskUpdate}!\n")
 
     
     #Before saving data make sure key header is written in csv file
