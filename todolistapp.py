@@ -25,7 +25,7 @@ def initializeApp():
 
     #Display app guidelines
     print(f"\n***Select Option Below To Proceed***")
-    guides = (f"\nAdd New Task: Enter 1", "Add More Tasks: Enter 2","Delete a Task: Enter 3", "Update a Task: Enter 4\n")
+    guides = (f"\nAdd New Task: Enter 1", "Delete a Task: Enter 2","Update a Task: Enter 3", "Delete All Tasks: Enter 4 \n")
     for guide in guides:
         print(guide)
     
@@ -33,20 +33,44 @@ def initializeApp():
     if choice == 1:
         writeTasks()
     elif choice == 2:
-        writeTasks()
-    elif choice == 3:
         #get task id from user(remeber to validate data)
         taskId = int(input("\nEnter Task ID/Number To Delete: "))
         deleteTasks(taskId)
-    elif choice == 4:
+    elif choice == 3:
         #get task id for task to edit
         taskId = int(input("\nEnter Task ID/Number To Edit: "))
         editTasks(taskId)
+    elif choice == 4:
+        #Delete All Tasks
+        deleteAllTasks()
     else:
         print(f"\nInvalid Input, Try again\n")
         
 
 def writeTasks():
+
+    #Write a new task
+    writeNewTask()
+
+
+    #Continue adding more tasks from user on demand.
+
+    print(f"\n*****To add more tasks enter 'Y or y' for Yes and 'N/n' for No*****\n")
+
+    
+
+    while True:
+        moretasks = input("Add more tasks?: ")
+        if moretasks == 'Y' or 'y':
+            writeNewTask()
+            break
+        else:
+            break
+
+        
+
+#Function that writes new tasks
+def writeNewTask():
 
     #get task from the user
     taskname = input(f"\nEnter name of task: ")
@@ -61,13 +85,7 @@ def writeTasks():
             writer.writerow({"taskname": taskname})
         print(f"\n***{taskname} - Task added!***\n")
 
-    #Continue adding more tasks from user on demand.
-
-    print(f"\n*****To add more tasks enter 'Y or y' for Yes and 'N/n' for No*****\n")
-
-    moretasks = input("Add more tasks?")
-
-
+# Function to list ass saved events
 def fetchTasks():
     savedtasks = []
     
@@ -80,8 +98,14 @@ def fetchTasks():
     for index, storedtask in enumerate(savedtasks):
         print(f"Id {index+1}: {storedtask['taskname']}")
 
+# Function to delete all events
+def deleteAllTasks():
+    #write the key header for our csv file 
+    with open("todolist.csv", 'w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=["taskname"])
+        writer.writeheader()
 
-# function to delete tasks
+# Function to delete specific tasks
 def deleteTasks(taskindex):
 
     savedtasks = []
