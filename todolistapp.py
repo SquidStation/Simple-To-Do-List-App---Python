@@ -4,11 +4,12 @@
 
     1.The app will ask for user to add task(s) on first run
     2.Store the data in memory (csv) file.
-    3.Retrieve data from memory(csv)
+    3.Retrieve saved data (csv)
     4.List all tasks with their status alongside.
     5.Delete a task
     6.Mark a task complete
     7.Update a task
+    8.Validate input data from the user
 
 """
 import csv
@@ -44,7 +45,7 @@ def initializeApp():
         #Delete All Tasks
         deleteAllTasks()
     else:
-        print(f"\nInvalid Input, Try again\n")
+        print(f"\nOption not Available, Try again\n")
         
 
 def writeTasks():
@@ -57,18 +58,18 @@ def writeTasks():
 
     print(f"\n*****To add more tasks enter 'Y or y' for Yes and 'N/n' for No*****\n")
 
-    
-
     while True:
         moretasks = input("Add more tasks?: ")
-        if moretasks == 'Y' or 'y':
+        if moretasks.lower() == 'y':
             writeNewTask()
+        elif moretasks.lower() == 'n':
+            print("\nThank you for using my todo list app...\n")
             break
-        else:
+        else: 
+            print("\nInvalid Input, Please Try Again\n")
             break
 
         
-
 #Function that writes new tasks
 def writeNewTask():
 
@@ -94,9 +95,13 @@ def fetchTasks():
         tasks = csv.DictReader(file)
         for row in tasks:
             savedtasks.append({"taskname": row['taskname']})
-    
-    for index, storedtask in enumerate(savedtasks):
-        print(f"Id {index+1}: {storedtask['taskname']}")
+
+    #if list empty let user know its empty
+    if len(savedtasks) == 0:
+        print("\nYour task list is empty\n")
+    else:
+        for index, storedtask in enumerate(savedtasks):
+            print(f"Id {index+1}: {storedtask['taskname']}")
 
 # Function to delete all events
 def deleteAllTasks():
