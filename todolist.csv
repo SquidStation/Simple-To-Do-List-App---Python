@@ -1,6 +1,4 @@
-taskname
-Feed Dog
-Take trash out tomorrow
-Call My Girl To Sate Date
-Wash Car
-Sell Motorcycle
+taskname,tasktime,taskstatus
+Go fishing,2026-12-05 00:20:00,Pending
+Assemble computer,2026-12-05 07:30:00,Pending
+Find Nimo,2026-12-05 07:33:00,Pending
