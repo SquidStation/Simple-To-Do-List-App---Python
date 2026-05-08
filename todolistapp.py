@@ -14,6 +14,7 @@
 
 """
 import csv
+from datetime import time
 from datetime import datetime
 import os
 
@@ -87,7 +88,7 @@ def writeNewTask():
 
     #get task time from the user
     tasktime = input(f"\nEnter task time(Day-Month-Year Hour:Minute AM/PM): ")
-    date_format = f'%m-%d-%Y %I:%M' #tasktime[-2] get from user whether its am or pm
+    date_format = f'%m-%d-%Y %I:%M %p' #tasktime[-2] get from user whether its am or pm
     #convert user string time to a datetime object
     tasktime_obj = datetime.strptime(tasktime, date_format)
 
@@ -106,7 +107,7 @@ def writeNewTask():
         writer.writerow({"taskname":taskname, "tasktime": tasktime_obj, "taskstatus": task_status})
         print(f"\n***{taskname} - Task added!***\n")
 
-# Function to list ass saved events
+# Function to list as saved events
 def fetchTasks():
     savedtasks = []
     
@@ -121,7 +122,11 @@ def fetchTasks():
         print("\nYour task list is empty!\n")
     else:
         for index, storedtask in enumerate(savedtasks):
-            print(f"Id {index+1}: {storedtask['taskname']} at {storedtask['tasktime']} ({storedtask['taskstatus']})")
+            date_format = f'%Y-%d-%m %H:%M:%S'
+            storedTime_obj = storedtask['tasktime']
+            tasktime_obj = datetime.strptime(storedTime_obj , date_format)
+            formated_time = tasktime_obj.strftime('%c')
+            print(f"Id {index+1}: -> {storedtask['taskname']} on {formated_time} ({storedtask['taskstatus']})")
 
 # Function to delete all events
 def deleteAllTasks():
