@@ -5,7 +5,7 @@
     1.The app will ask for user to add task(s) on first run √
     2.Store the data in memory (To local csv file). √
     3.Retrieve saved data (Trom local csv file) √
-    4.List all tasks with their status alongside.1
+    4.List all tasks with their status alongside.
     5.Delete a task √
     6.Mark a task complete
     7.Update a task √
@@ -14,7 +14,6 @@
 
 """
 import csv
-from datetime import time
 from datetime import datetime
 import os
 
@@ -117,6 +116,9 @@ def fetchTasks():
         for row in tasks:
             savedtasks.append({"taskname": row['taskname'], "tasktime": row['tasktime'], "taskstatus": row['taskstatus']})
 
+    #sort fetched to do list using timestamp
+    savedtasks.sort(key= lambda x: datetime.strptime(x['tasktime'], "%Y-%d-%m %H:%M:%S") )
+
     #if list empty let user know its empty
     if len(savedtasks) == 0:
         print("\nYour task list is empty!\n")
@@ -125,13 +127,14 @@ def fetchTasks():
             date_format = f'%Y-%d-%m %H:%M:%S'
             storedTime_obj = storedtask['tasktime']
             tasktime_obj = datetime.strptime(storedTime_obj , date_format)
-            formated_time = tasktime_obj.strftime('%c')
+            #match users localtime display format
+            formated_time = tasktime_obj.strftime('%a %b %d, %Y %I:%M:%S %p')
             print(f"Id {index+1}: -> {storedtask['taskname']} on {formated_time} ({storedtask['taskstatus']})")
 
 # Function to delete all events
 def deleteAllTasks():
     #write the key header for our csv file 
-    fields = ["taskname","tasktime","taskstatus"]
+    fields = ["taskname","tasktime","taskstatus"] #header keys array/list
     with open("todolist.csv", 'w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=fields)
         writer.writeheader()
