@@ -11,6 +11,7 @@
     7.Update a task √
     8.Validate input data from the user √
     9.Gracefully handle all user related or system errors
+    10. Add timestamps to each to do list item and sort the items √
 
 """
 import csv
@@ -29,7 +30,7 @@ def initializeApp():
 
     #Display app guidelines
     print(f"\n***Select Option Below To Proceed***")
-    guides = (f"\nAdd New Task: Enter 1", "Delete a Task: Enter 2","Update a Task: Enter 3", "Delete All Tasks: Enter 4 \n")
+    guides = (f"\nAdd New Task: Enter 1", "Delete a Task: Enter 2","Update a Task: Enter 3", "Delete All Tasks: Enter 4", "Complete Task: Enter 5 \n")
     for guide in guides:
         print(guide)
     
@@ -50,6 +51,10 @@ def initializeApp():
         elif choice == 4:
             #Delete All Tasks
             deleteAllTasks()
+        elif choice == 5:
+            #Complete a task
+            taskId = int(input(f"\n Enter Task ID/Number to Mark Complete"))
+            completeTask(taskId)
         else:
             print(f"\nSelected Option Not Available, Try again\n")
     
@@ -106,20 +111,20 @@ def writeNewTask():
         writer.writerow({"taskname":taskname, "tasktime": tasktime_obj, "taskstatus": task_status})
         print(f"\n***{taskname} - Task added!***\n")
 
-# Function to list as saved events
+# Function to list all saved to-do-list events
 def fetchTasks():
     savedtasks = []
     
-    # retrieve data from memory
+    # Read data from memory and save to a local variable(savedtasks)
     with open("todolist.csv") as file:
         tasks = csv.DictReader(file)
         for row in tasks:
             savedtasks.append({"taskname": row['taskname'], "tasktime": row['tasktime'], "taskstatus": row['taskstatus']})
 
-    #sort fetched to do list using timestamp
-    savedtasks.sort(key= lambda x: datetime.strptime(x['tasktime'], "%Y-%d-%m %H:%M:%S") )
+    #sort fetched to-do-list using timestamp
+    savedtasks.sort(key=lambda x: datetime.strptime(x['tasktime'], "%Y-%d-%m %H:%M:%S"))
 
-    #if list empty let user know its empty
+    #if to-do-list empty let user know its empty
     if len(savedtasks) == 0:
         print("\nYour task list is empty!\n")
     else:
@@ -130,6 +135,24 @@ def fetchTasks():
             #match users localtime display format
             formated_time = tasktime_obj.strftime('%a %b %d, %Y %I:%M:%S %p')
             print(f"Id {index+1}: -> {storedtask['taskname']} on {formated_time} ({storedtask['taskstatus']})")
+
+    #write the local sorted to-do-list to memory hence everytime the program is launched it sorts the stored csv file
+    fields = ["taskname","tasktime","taskstatus"]
+    #variables to check if csv file exists and whether its empty
+    file_exists= os.path.isfile("todolist.csv")
+    file_empty = os.path.getsize("todolist.csv") == 0 if file_exists else True
+
+    #Force a clean rewrite of the csv file afresh
+    with open('todolist.csv', 'w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fields)
+        writer.writeheader()
+    
+    # loop through the new sorted to-do-list and add all to stored csv memory
+    for savedtask in savedtasks:
+        with open('todolist.csv', 'a', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=fields)
+            writer.writerow({"taskname": savedtask['taskname'], "tasktime": savedtask['tasktime'], "taskstatus": savedtask['taskstatus']})
+
 
 # Function to delete all events
 def deleteAllTasks():
@@ -167,16 +190,18 @@ def deleteTasks(taskindex):
     else:
         print(f"\nTask Doesn't Exist\n")
 
-
+    #write the remaining tasks to memory
+    fields = ["taskname","tasktime","taskstatus"] #header keys array/list
     with open('todolist.csv', 'w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=["taskname"])
+        writer = csv.DictWriter(file, fieldnames= fields)
         writer.writeheader()
     #rewrite updated data to memory
     for savedtask in savedtasks:
         with open('todolist.csv', 'a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=["taskname"])
-            writer.writerow({ "taskname": savedtask['taskname']})
+            writer = csv.DictWriter(file, fieldnames=fields)
+            writer.writerow({"taskname": savedtask['taskname'], "tasktime": savedtask['tasktime'], "taskstatus": savedtask['taskstatus']})
 
+#Function to edit/modify a task details
 def editTasks(taskindex):
 
     savedTasks = []
@@ -206,16 +231,22 @@ def editTasks(taskindex):
         print(f"\nTask Doesn't Exist\n")
     
     #Before saving data make sure key header is written in csv file
+    fields = ["taskname","tasktime","taskstatus"] #header keys array/list
     with open("todolist.csv", 'w', newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=['taskname'])
+        writer = csv.DictWriter(file, fieldnames=fields)
         writer.writeheader()
 
     #Save updated data to memory
-    for savedTask in savedTasks:
+    for savedtask in savedTasks:
         with open("todolist.csv", 'a') as file:
-            writer = csv.DictWriter(file, fieldnames=["taskname"])
-            writer.writerow({"taskname": savedTask['taskname']})
+            writer = csv.DictWriter(file, fieldnames=fields)
+            writer.writerow({"taskname": savedtask['taskname'], "tasktime": savedtask['tasktime'], "taskstatus": savedtask['taskstatus']})
 
+#Fucntion to Mark a task complete
+def completeTask(taskindex):
+
+    #array to save all tasks that will be retrieved from memory
+    savedTasks = []
 
 if __name__ == "__main__":
     main()
