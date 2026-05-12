@@ -53,13 +53,13 @@ def initializeApp():
             deleteAllTasks()
         elif choice == 5:
             #Complete a task
-            taskId = int(input(f"\n Enter Task ID/Number to Mark Complete"))
+            taskId = int(input(f"\nEnter Task ID/Number to Mark Complete: "))
             completeTask(taskId)
         else:
             print(f"\nSelected Option Not Available, Try again\n")
     
     except ValueError:
-        print("\n Error: Special characters, letters and decimals numbers NOT allowed \n")
+        print("\nError: Special characters, letters and decimals numbers NOT allowed \n")
         
 
 def writeTasks():
@@ -92,7 +92,7 @@ def writeNewTask():
 
     #get task time from the user
     tasktime = input(f"\nEnter task time(Day-Month-Year Hour:Minute AM/PM): ")
-    date_format = f'%m-%d-%Y %I:%M %p' #tasktime[-2] get from user whether its am or pm
+    date_format = f'%m-%d-%Y %I:%M %p' 
     #convert user string time to a datetime object
     tasktime_obj = datetime.strptime(tasktime, date_format)
 
@@ -218,13 +218,22 @@ def editTasks(taskindex):
 
     for index, savedTask in enumerate(savedTasks):
         if index+1 == taskindex:
-            taskUpdate = input("\nEnter New Name: ")
-            updatedTask = {"taskname": taskUpdate}
+            #get updated task details
+            taskNameUpdate = input("\nEnter New Name: ")
+            #get new time and date from user
+            taskTimeUpdate = input("\nEnter New time (Day-Month-Year Hour:Minute AM/PM): ")
+            date_format = f'%m-%d-%Y %I:%M %p' 
+            #convert user string time to a datetime object
+            tasktime_obj = datetime.strptime(taskTimeUpdate, date_format) 
+            #add a task status(default will be pending)
+            task_status = "Pending"
+            #variable dictionary with all the updated details
+            updatedTask = {"taskname": taskNameUpdate, "tasktime":tasktime_obj, "taskstatus":task_status}
             savedTasks[index] = updatedTask
             task_found = savedTask
-            task_updated = taskUpdate
+            task_updated = taskNameUpdate
             
-    #Let user know if item is deleted
+    #Let user know if item is updated
     if task_found:
         print(f"\n'{task_found['taskname']}' Updated to '{task_updated}'!\n")
     else:
@@ -238,7 +247,7 @@ def editTasks(taskindex):
 
     #Save updated data to memory
     for savedtask in savedTasks:
-        with open("todolist.csv", 'a') as file:
+        with open("todolist.csv", 'a', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=fields)
             writer.writerow({"taskname": savedtask['taskname'], "tasktime": savedtask['tasktime'], "taskstatus": savedtask['taskstatus']})
 
@@ -247,6 +256,43 @@ def completeTask(taskindex):
 
     #array to save all tasks that will be retrieved from memory
     savedTasks = []
+
+    #get stored data from memory
+    with open("todolist.csv") as file:
+        tasks = csv.DictReader(file)
+        for row in tasks:
+            savedTasks.append(row)
+    
+    #find item to mark complete flags
+    task_found = None
+    task_completed = None
+
+    for index, savedTask in enumerate(savedTasks):
+        if index+1 == taskindex:
+             #get current task status
+             task_completed = savedTasks[index]['taskname']
+             task_found = savedTask
+             taskstatus = savedTasks[index]['taskstatus']  
+             if taskstatus == 'Pending':   
+                savedTasks[index]['taskstatus'] = 'Completed'
+                 
+    #Save updated data to memory
+    fields = ["taskname","tasktime","taskstatus"] #header keys array/list
+
+    if task_found:
+        #rewrite file fieldnames
+        with open('todolist.csv', 'w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=fields)
+            writer.writeheader()
+        #save all data to memory
+        for savedtask in savedTasks:
+            with open('todolist.csv', 'a', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=fields)
+                writer.writerow({"taskname": savedtask['taskname'], "tasktime": savedtask['tasktime'], "taskstatus": savedtask['taskstatus']})
+        #notify user task is completed
+        print(f'\n{task_completed} Completed!\n')
+    else:
+        print("\nTask Not Found, Please Try Again\n")
 
 if __name__ == "__main__":
     main()
