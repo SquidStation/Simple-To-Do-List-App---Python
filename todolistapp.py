@@ -5,23 +5,25 @@
     1.The app will ask for user to add task(s) on first run √
     2.Store the data in memory (To local csv file). √
     3.Retrieve saved data (Trom local csv file) √
-    4.List all tasks with their status alongside.
+    4.List all tasks with their status alongside. √
     5.Delete a task √
-    6.Mark a task complete
+    6.Mark a task complete √
     7.Update a task √
     8.Validate input data from the user √
-    9.Gracefully handle all user related or system errors
+    9.Gracefully handle all user related or system errors in user friendly manner √
     10. Add timestamps to each to do list item and sort the items √
 
 """
+#Call necessary liblaries that will be needed by app
 import csv
 from datetime import datetime
 import os
 
+#Load our main function
 def main():
     initializeApp()
 
-
+#Function that loads/calls all functions depending on the user input
 def initializeApp():
 
     #Display stored tasks
@@ -61,14 +63,14 @@ def initializeApp():
     except ValueError:
         print("\nError: Special characters, letters and decimals numbers NOT allowed \n")
         
-
+#Function to initiate adding new tasks
 def writeTasks():
 
     #Write a new task
     writeNewTask()
 
 
-    #Continue adding more tasks from user on demand.
+    #Continue adding more tasks from user, on demand.
 
     print(f"\n*****Add more tasks? Enter 'y/yes' for YES OR 'n/no' for NO*****\n")
 
